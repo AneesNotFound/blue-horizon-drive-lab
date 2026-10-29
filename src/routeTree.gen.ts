@@ -10,33 +10,69 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EnergyManagementRouteImport } from './routes/energy-management'
+import { Route as PredictionCentreRouteImport } from './routes/prediction-centre'
+import { Route as RoutePlannerRouteImport } from './routes/route-planner'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnergyManagementRoute = EnergyManagementRouteImport.update({
+  id: '/energy-management',
+  path: '/energy-management',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PredictionCentreRoute = PredictionCentreRouteImport.update({
+  id: '/prediction-centre',
+  path: '/prediction-centre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoutePlannerRoute = RoutePlannerRouteImport.update({
+  id: '/route-planner',
+  path: '/route-planner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/energy-management': typeof EnergyManagementRoute
+  '/prediction-centre': typeof PredictionCentreRoute
+  '/route-planner': typeof RoutePlannerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/energy-management': typeof EnergyManagementRoute
+  '/prediction-centre': typeof PredictionCentreRoute
+  '/route-planner': typeof RoutePlannerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/energy-management': typeof EnergyManagementRoute
+  '/prediction-centre': typeof PredictionCentreRoute
+  '/route-planner': typeof RoutePlannerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/energy-management' | '/prediction-centre' | '/route-planner'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/energy-management' | '/prediction-centre' | '/route-planner'
+  id:
+    | '__root__'
+    | '/'
+    | '/energy-management'
+    | '/prediction-centre'
+    | '/route-planner'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EnergyManagementRoute: typeof EnergyManagementRoute
+  PredictionCentreRoute: typeof PredictionCentreRoute
+  RoutePlannerRoute: typeof RoutePlannerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +84,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/energy-management': {
+      id: '/energy-management'
+      path: '/energy-management'
+      fullPath: '/energy-management'
+      preLoaderRoute: typeof EnergyManagementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prediction-centre': {
+      id: '/prediction-centre'
+      path: '/prediction-centre'
+      fullPath: '/prediction-centre'
+      preLoaderRoute: typeof PredictionCentreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/route-planner': {
+      id: '/route-planner'
+      path: '/route-planner'
+      fullPath: '/route-planner'
+      preLoaderRoute: typeof RoutePlannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EnergyManagementRoute: EnergyManagementRoute,
+  PredictionCentreRoute: PredictionCentreRoute,
+  RoutePlannerRoute: RoutePlannerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
