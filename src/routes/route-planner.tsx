@@ -48,7 +48,7 @@ const DEMO_ROUTES = [
 
 function RoutePlanner() {
   const [selected, setSelected] = useState(0);
-  const route = DEMO_ROUTES[selected];
+  const route = DEMO_ROUTES[selected] ?? DEMO_ROUTE;
   // Simulated energy estimates from the demo vehicle model — not real route data.
   const energyEstimate = route.lengthKm * (selected === 1 ? 0.168 : selected === 2 ? 0.121 : 0.148);
 

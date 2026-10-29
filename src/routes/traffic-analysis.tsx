@@ -76,7 +76,8 @@ function TrafficAnalysis() {
               <tbody>
                 {DEMO_INTERSECTIONS.map((ix, i) => {
                   const etaMin = (ix.distanceKm / avgSpeedKph) * 60;
-                  const simPhase = ["Green", "Amber", "Red", "Red", "Green"][Math.floor(latest.t / 8 + i * 3) % 5];
+                  const phases = ["Green", "Amber", "Red", "Red", "Green"] as const;
+                  const simPhase = phases[Math.floor(latest.t / 8 + i * 3) % 5] ?? "Green";
                   return (
                     <tr key={ix.id} className="border-b border-border/50 last:border-0">
                       <td className="py-2.5 font-medium text-foreground">{ix.name}</td>

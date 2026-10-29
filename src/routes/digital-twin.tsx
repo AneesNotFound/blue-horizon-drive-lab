@@ -93,14 +93,13 @@ function DigitalTwin() {
           <CardContent className="space-y-3 text-sm">
             <ul className="space-y-2 text-muted-foreground">
               <li>
-                <span className="text-foreground">Rolling resistance:</span> \(P_{roll} = C_{rr} \cdot m \cdot g \cdot v\)
+                <span className="text-foreground">Rolling resistance:</span> P_roll = C_rr · m · g · v
               </li>
               <li>
-                <span className="text-foreground">Aerodynamic drag:</span> \(P_{aero} = \tfrac{1}{2} \rho \, C_d \, A \,
-                v^3\)
+                <span className="text-foreground">Aerodynamic drag:</span> P_aero = ½ · ρ · C_d · A · v³
               </li>
               <li>
-                <span className="text-foreground">Acceleration:</span> \(P_{accel} = m \cdot a \cdot v\)
+                <span className="text-foreground">Acceleration:</span> P_accel = m · a · v
               </li>
               <li>
                 <span className="text-foreground">Drivetrain losses:</span> demand divided by efficiency when
@@ -121,7 +120,7 @@ function DigitalTwin() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <p className="rounded-lg border border-glow/40 bg-glow/10 px-3 py-2.5 font-display text-base text-glow">
-              \(E = \tfrac{1}{2} \, C \, V^2\)
+              E = ½ · C · V²
             </p>
             <ul className="space-y-2 text-muted-foreground">
               <li>• Voltage is mapped linearly onto SOC between the configured limits.</li>

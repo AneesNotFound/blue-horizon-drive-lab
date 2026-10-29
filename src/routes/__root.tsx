@@ -6,10 +6,9 @@ import {
   useRouter,
   HeadContent,
   Scripts,
-  SidebarProvider,
-  SidebarTrigger,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useEffect, type ReactNode } from "react";
 
 import { AppSidebar } from "@/components/app-sidebar";

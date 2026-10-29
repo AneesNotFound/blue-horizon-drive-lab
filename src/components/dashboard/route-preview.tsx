@@ -45,13 +45,13 @@ export function RoutePreviewCard() {
             />
             {/* intersections */}
             {DEMO_INTERSECTIONS.map((ix) => {
-              const pts = [
+              const pts: [number, number][] = [
                 [110, 168],
                 [230, 121],
                 [360, 122],
                 [500, 62],
-              ] as const;
-              const [x, y] = pts[Number(ix.id.split("-")[1]) - 1];
+              ];
+              const [x, y] = pts[Number(ix.id.split("-")[1]) - 1] ?? [0, 0];
               return (
                 <g key={ix.id}>
                   <circle cx={x} cy={y} r={7} fill="var(--color-background)" stroke="var(--color-warning)" strokeWidth={2} />

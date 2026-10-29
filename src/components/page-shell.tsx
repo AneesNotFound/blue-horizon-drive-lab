@@ -32,7 +32,7 @@ export function DataSourceBadge({
   className,
 }: {
   kind: DataSourceKind;
-  label?: string;
+  label?: string | undefined;
   className?: string;
 }) {
   return (
