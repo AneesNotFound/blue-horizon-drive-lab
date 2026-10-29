@@ -10,18 +10,33 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DigitalTwinRouteImport } from './routes/digital-twin'
 import { Route as EnergyManagementRouteImport } from './routes/energy-management'
+import { Route as ModelPerformanceRouteImport } from './routes/model-performance'
 import { Route as PredictionCentreRouteImport } from './routes/prediction-centre'
 import { Route as RoutePlannerRouteImport } from './routes/route-planner'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as TrafficAnalysisRouteImport } from './routes/traffic-analysis'
+import { Route as TripHistoryRouteImport } from './routes/trip-history'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DigitalTwinRoute = DigitalTwinRouteImport.update({
+  id: '/digital-twin',
+  path: '/digital-twin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnergyManagementRoute = EnergyManagementRouteImport.update({
   id: '/energy-management',
   path: '/energy-management',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModelPerformanceRoute = ModelPerformanceRouteImport.update({
+  id: '/model-performance',
+  path: '/model-performance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PredictionCentreRoute = PredictionCentreRouteImport.update({
@@ -34,45 +49,102 @@ const RoutePlannerRoute = RoutePlannerRouteImport.update({
   path: '/route-planner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrafficAnalysisRoute = TrafficAnalysisRouteImport.update({
+  id: '/traffic-analysis',
+  path: '/traffic-analysis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TripHistoryRoute = TripHistoryRouteImport.update({
+  id: '/trip-history',
+  path: '/trip-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/digital-twin': typeof DigitalTwinRoute
   '/energy-management': typeof EnergyManagementRoute
+  '/model-performance': typeof ModelPerformanceRoute
   '/prediction-centre': typeof PredictionCentreRoute
   '/route-planner': typeof RoutePlannerRoute
+  '/settings': typeof SettingsRoute
+  '/traffic-analysis': typeof TrafficAnalysisRoute
+  '/trip-history': typeof TripHistoryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/digital-twin': typeof DigitalTwinRoute
   '/energy-management': typeof EnergyManagementRoute
+  '/model-performance': typeof ModelPerformanceRoute
   '/prediction-centre': typeof PredictionCentreRoute
   '/route-planner': typeof RoutePlannerRoute
+  '/settings': typeof SettingsRoute
+  '/traffic-analysis': typeof TrafficAnalysisRoute
+  '/trip-history': typeof TripHistoryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/digital-twin': typeof DigitalTwinRoute
   '/energy-management': typeof EnergyManagementRoute
+  '/model-performance': typeof ModelPerformanceRoute
   '/prediction-centre': typeof PredictionCentreRoute
   '/route-planner': typeof RoutePlannerRoute
+  '/settings': typeof SettingsRoute
+  '/traffic-analysis': typeof TrafficAnalysisRoute
+  '/trip-history': typeof TripHistoryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/energy-management' | '/prediction-centre' | '/route-planner'
+    | '/'
+    | '/digital-twin'
+    | '/energy-management'
+    | '/model-performance'
+    | '/prediction-centre'
+    | '/route-planner'
+    | '/settings'
+    | '/traffic-analysis'
+    | '/trip-history'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/energy-management' | '/prediction-centre' | '/route-planner'
+  to:
+    | '/'
+    | '/digital-twin'
+    | '/energy-management'
+    | '/model-performance'
+    | '/prediction-centre'
+    | '/route-planner'
+    | '/settings'
+    | '/traffic-analysis'
+    | '/trip-history'
   id:
     | '__root__'
     | '/'
+    | '/digital-twin'
     | '/energy-management'
+    | '/model-performance'
     | '/prediction-centre'
     | '/route-planner'
+    | '/settings'
+    | '/traffic-analysis'
+    | '/trip-history'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DigitalTwinRoute: typeof DigitalTwinRoute
   EnergyManagementRoute: typeof EnergyManagementRoute
+  ModelPerformanceRoute: typeof ModelPerformanceRoute
   PredictionCentreRoute: typeof PredictionCentreRoute
   RoutePlannerRoute: typeof RoutePlannerRoute
+  SettingsRoute: typeof SettingsRoute
+  TrafficAnalysisRoute: typeof TrafficAnalysisRoute
+  TripHistoryRoute: typeof TripHistoryRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -84,11 +156,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/digital-twin': {
+      id: '/digital-twin'
+      path: '/digital-twin'
+      fullPath: '/digital-twin'
+      preLoaderRoute: typeof DigitalTwinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/energy-management': {
       id: '/energy-management'
       path: '/energy-management'
       fullPath: '/energy-management'
       preLoaderRoute: typeof EnergyManagementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/model-performance': {
+      id: '/model-performance'
+      path: '/model-performance'
+      fullPath: '/model-performance'
+      preLoaderRoute: typeof ModelPerformanceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/prediction-centre': {
@@ -105,14 +191,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RoutePlannerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/traffic-analysis': {
+      id: '/traffic-analysis'
+      path: '/traffic-analysis'
+      fullPath: '/traffic-analysis'
+      preLoaderRoute: typeof TrafficAnalysisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trip-history': {
+      id: '/trip-history'
+      path: '/trip-history'
+      fullPath: '/trip-history'
+      preLoaderRoute: typeof TripHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DigitalTwinRoute: DigitalTwinRoute,
   EnergyManagementRoute: EnergyManagementRoute,
+  ModelPerformanceRoute: ModelPerformanceRoute,
   PredictionCentreRoute: PredictionCentreRoute,
   RoutePlannerRoute: RoutePlannerRoute,
+  SettingsRoute: SettingsRoute,
+  TrafficAnalysisRoute: TrafficAnalysisRoute,
+  TripHistoryRoute: TripHistoryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
