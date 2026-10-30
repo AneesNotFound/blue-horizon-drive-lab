@@ -401,14 +401,19 @@ export type DemoTrip = {
   scSocEnd: number;
   strategy: string;
   predictedHighLoadEvents: number;
+  /** Compatibility fields for existing pages. */
+  route: string;
+  energyKwhPerKm: number;
+  peakBatteryKw: number;
+  completedAt: string;
 };
 
 export const DEMO_TRIPS: DemoTrip[] = [
-  { id: "demo-trip-001", origin: "Central Station", destination: "Technology Park", scenario: "Morning peak — stop-and-go", distanceKm: 12.4, durationMin: 31, batterySocStart: 75, batterySocEnd: 70, scSocStart: 80, scSocEnd: 72, strategy: "AI-predictive hybrid", predictedHighLoadEvents: 3 },
-  { id: "demo-trip-002", origin: "Central Station", destination: "Technology Park", scenario: "Midday mixed traffic", distanceKm: 12.4, durationMin: 28, batterySocStart: 75, batterySocEnd: 71, scSocStart: 80, scSocEnd: 75, strategy: "Rule-based hybrid", predictedHighLoadEvents: 2 },
-  { id: "demo-trip-003", origin: "Central Station", destination: "Technology Park", scenario: "Free-flow evening run", distanceKm: 12.4, durationMin: 26, batterySocStart: 75, batterySocEnd: 69, scSocStart: 80, scSocEnd: 78, strategy: "Battery-only", predictedHighLoadEvents: 3 },
-  { id: "demo-trip-004", origin: "Technology Park", destination: "Central Station", scenario: "Uphill-heavy return run", distanceKm: 12.4, durationMin: 30, batterySocStart: 75, batterySocEnd: 69, scSocStart: 80, scSocEnd: 70, strategy: "AI-predictive hybrid", predictedHighLoadEvents: 4 },
-  { id: "demo-trip-005", origin: "Technology Park", destination: "Central Station", scenario: "Night run — low traffic", distanceKm: 12.4, durationMin: 24, batterySocStart: 75, batterySocEnd: 72, scSocStart: 80, scSocEnd: 77, strategy: "Rule-based hybrid", predictedHighLoadEvents: 1 },
+  { id: "demo-trip-001", origin: "Central Station", destination: "Technology Park", scenario: "Morning peak — stop-and-go", distanceKm: 12.4, durationMin: 31, batterySocStart: 75, batterySocEnd: 70, scSocStart: 80, scSocEnd: 72, strategy: "AI-predictive hybrid", predictedHighLoadEvents: 3, route: "Central Station → Technology Park (demo route)", energyKwhPerKm: 0.242, peakBatteryKw: 41.2, completedAt: "Demo run" },
+  { id: "demo-trip-002", origin: "Central Station", destination: "Technology Park", scenario: "Midday mixed traffic", distanceKm: 12.4, durationMin: 28, batterySocStart: 75, batterySocEnd: 71, scSocStart: 80, scSocEnd: 75, strategy: "Rule-based hybrid", predictedHighLoadEvents: 2, route: "Central Station → Technology Park (demo route)", energyKwhPerKm: 0.194, peakBatteryKw: 47.8, completedAt: "Demo run" },
+  { id: "demo-trip-003", origin: "Central Station", destination: "Technology Park", scenario: "Free-flow evening run", distanceKm: 12.4, durationMin: 26, batterySocStart: 75, batterySocEnd: 69, scSocStart: 80, scSocEnd: 78, strategy: "Battery-only", predictedHighLoadEvents: 3, route: "Central Station → Technology Park (demo route)", energyKwhPerKm: 0.29, peakBatteryKw: 52.4, completedAt: "Demo run" },
+  { id: "demo-trip-004", origin: "Technology Park", destination: "Central Station", scenario: "Uphill-heavy return run", distanceKm: 12.4, durationMin: 30, batterySocStart: 75, batterySocEnd: 69, scSocStart: 80, scSocEnd: 70, strategy: "AI-predictive hybrid", predictedHighLoadEvents: 4, route: "Technology Park → Central Station (demo route)", energyKwhPerKm: 0.29, peakBatteryKw: 44.0, completedAt: "Demo run" },
+  { id: "demo-trip-005", origin: "Technology Park", destination: "Central Station", scenario: "Night run — low traffic", distanceKm: 12.4, durationMin: 24, batterySocStart: 75, batterySocEnd: 72, scSocStart: 80, scSocEnd: 77, strategy: "Rule-based hybrid", predictedHighLoadEvents: 1, route: "Technology Park → Central Station (demo route)", energyKwhPerKm: 0.145, peakBatteryKw: 38.5, completedAt: "Demo run" },
 ];
 
 /** Energy drawn from the pack, derived from the SOC drop (keeps records consistent). */
