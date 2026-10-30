@@ -57,6 +57,73 @@ export function PowerHistoryChart({ history }: { history: TelemetryPoint[] }) {
   );
 }
 
+export function SpeedHistoryChart({ history }: { history: TelemetryPoint[] }) {
+  const data = history.slice(-60).map((p) => ({ t: p.t, speedKph: Number(p.speedKph.toFixed(1)) }));
+  return (
+    <div className="h-52 w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -18 }}>
+          <defs>
+            <linearGradient id="speedFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--color-glow)" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="var(--color-glow)" stopOpacity={0.03} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="t" tick={axisStyle} tickLine={false} axisLine={false} width={40} />
+          <YAxis tick={axisStyle} tickLine={false} axisLine={false} unit=" km/h" domain={[0, 100]} />
+          <Tooltip contentStyle={tooltipStyle} labelFormatter={(v) => `t = ${v}s (simulated)`} />
+          <Area
+            type="monotone"
+            dataKey="speedKph"
+            name="Vehicle speed"
+            stroke="var(--color-glow)"
+            fill="url(#speedFill)"
+            strokeWidth={2}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+export function SocHistoryChart({ history }: { history: TelemetryPoint[] }) {
+  const data = history.slice(-60).map((p) => ({
+    t: p.t,
+    batterySoc: Number(p.batterySocPct.toFixed(2)),
+    supercapSoc: Number(p.supercapSocPct.toFixed(1)),
+  }));
+  return (
+    <div className="h-52 w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -18 }}>
+          <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="t" tick={axisStyle} tickLine={false} axisLine={false} width={40} />
+          <YAxis tick={axisStyle} tickLine={false} axisLine={false} unit=" %" domain={[0, 100]} />
+          <Tooltip contentStyle={tooltipStyle} labelFormatter={(v) => `t = ${v}s (simulated)`} />
+          <Line
+            type="monotone"
+            dataKey="batterySoc"
+            name="Battery SOC (%)"
+            stroke="var(--color-primary)"
+            strokeWidth={2}
+            dot={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="supercapSoc"
+            name="Supercapacitor SOC (%)"
+            stroke="var(--color-glow)"
+            strokeWidth={1.5}
+            strokeDasharray="5 4"
+            dot={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 export function DemandForecastChart({
   forecast,
   thresholdKw,
