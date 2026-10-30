@@ -11,6 +11,7 @@ import {
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useEffect, type ReactNode } from "react";
 
+import { AppDataProvider } from "@/hooks/app-state";
 import { AppSidebar } from "@/components/app-sidebar";
 import { DataSourceBadge } from "@/components/page-shell";
 
@@ -132,7 +133,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SidebarProvider>
+      <AppDataProvider>
+        <SidebarProvider>
         <AppSidebar />
         <div className="flex min-h-svh w-full min-w-0 flex-1 flex-col">
           <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-background/85 px-4 backdrop-blur md:px-6">
@@ -148,7 +150,8 @@ function RootComponent() {
             <Outlet />
           </main>
         </div>
-      </SidebarProvider>
+        </SidebarProvider>
+      </AppDataProvider>
     </QueryClientProvider>
   );
 }
