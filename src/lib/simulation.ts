@@ -131,7 +131,7 @@ export function probabilityFromPower(powerKw: number, thresholdKw: number): numb
 // ---------------------------------------------------------------------------
 
 export function forecastDemand(
-  latest: TelemetryPoint,
+  latest: Pick<TelemetryPoint, "t" | "distanceCoveredKm">,
   horizonSec = DEFAULT_HORIZON_SEC,
   thresholdKw = DEFAULT_THRESHOLD_KW,
   profile: VehicleProfile = DEMO_VEHICLE,
@@ -308,7 +308,21 @@ export function stepSim(prev: TelemetryPoint, params: SimParams = DEFAULT_SIM_PA
   return decorate(next, params);
 }
 
-export { mergeProfile };
+export { mergeProfile, DEMO_ROUTE, DEMO_VEHICLE, DEMO_SEGMENTS, supercapStoredEnergyKwh, supercapMaxAssistKw, tractionPowerKw, routeSegmentAtKm };
+export {
+  DEMO_INTERSECTIONS,
+  DEMO_TRIPS,
+  DEMO_HIGH_LOAD_THRESHOLD_KW,
+  DEFAULT_THRESHOLD_KW,
+  DEFAULT_HORIZON_SEC,
+  STRATEGIES,
+  evaluateStrategy,
+  evaluateAllStrategies,
+  signalDemandEffect,
+  nextIntersectionAhead,
+  tripEnergyConsumedKwh,
+  tripEnergyPerKm,
+} from "./demo-data";
 
 /** Strategy comparison snapshot used by the dashboard panel (simulated). */
 export function strategyComparison(latest: TelemetryPoint) {

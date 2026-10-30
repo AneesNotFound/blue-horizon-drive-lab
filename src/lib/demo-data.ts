@@ -31,7 +31,26 @@ export const DEMO_VEHICLE = {
   maxSpeedKph: 100,
 } as const;
 
-export type VehicleProfile = typeof DEMO_VEHICLE;
+export type VehicleProfile = {
+  name: string;
+  type: string;
+  massKg: number;
+  rollingResistance: number;
+  dragCoefficient: number;
+  frontalAreaM2: number;
+  drivetrainEfficiency: number;
+  batteryCapacityKwh: number;
+  batteryVoltage: number;
+  batteryContinuousPowerKw: number;
+  batteryPeakPowerKw: number;
+  initialBatterySocPct: number;
+  batterySohPct: number;
+  supercapCapacitanceF: number;
+  supercapVoltageMax: number;
+  supercapVoltageMin: number;
+  initialSupercapSocPct: number;
+  maxSpeedKph: number;
+};
 
 /** Fields the Settings page may override; physics uses the merged profile. */
 export type ProfileOverrides = {
@@ -44,11 +63,11 @@ export type ProfileOverrides = {
   drivetrainEfficiency: number;
 };
 
-/** Kept for existing imports; the configurable value lives in app settings. */
-export const DEMO_HIGH_LOAD_THRESHOLD_KW = DEFAULT_THRESHOLD_KW;
-
 export const DEFAULT_THRESHOLD_KW = 25;
 export const DEFAULT_HORIZON_SEC = 60;
+
+/** Kept for existing imports; the configurable value lives in app settings. */
+export const DEMO_HIGH_LOAD_THRESHOLD_KW = DEFAULT_THRESHOLD_KW;
 
 export function mergeProfile(overrides?: Partial<ProfileOverrides>): VehicleProfile {
   return { ...DEMO_VEHICLE, ...(overrides ?? {}) };
@@ -163,7 +182,7 @@ export function routeSegmentAtKm(km: number): RouteSegment {
   for (const s of DEMO_SEGMENTS) {
     if (clamped >= s.startKm && clamped < s.startKm + s.lengthKm) return s;
   }
-  return DEMO_SEGMENTS[DEMO_SEGMENTS.length - 1];
+  return DEMO_SEGMENTS[DEMO_SEGMENTS.length - 1]!;
 }
 
 // ---------------------------------------------------------------------------
@@ -217,7 +236,7 @@ export function signalDemandEffect(signal: SignalState, stoppingProbability: num
 export function nextIntersectionAhead(positionKm: number): { intersection: DemoIntersection; distanceAheadKm: number } | null {
   const pos = ((positionKm % DEMO_ROUTE.lengthKm) + DEMO_ROUTE.lengthKm) % DEMO_ROUTE.lengthKm;
   const ahead = DEMO_INTERSECTIONS.filter((ix) => ix.distanceKm > pos).sort((a, b) => a.distanceKm - b.distanceKm);
-  const next = ahead[0] ?? DEMO_INTERSECTIONS[0];
+  const next: DemoIntersection = ahead[0] ?? DEMO_INTERSECTIONS[0]!;
   const distanceAhead = ahead[0] ? next.distanceKm - pos : DEMO_ROUTE.lengthKm - pos + next.distanceKm;
   return { intersection: next, distanceAheadKm: Number(distanceAhead.toFixed(2)) };
 }
@@ -338,7 +357,7 @@ export function evaluateStrategy(id: StrategyId, input: DecisionInput): Strategy
       totalKw: Number(demandKw.toFixed(2)),
       deficitKw: 0,
       batteryWithinContinuousLimit: batteryKw <= batteryContinuousKw + 0.05,
-      supercapEnergyOk,
+      supercapEnergyOk: scEnergyOk,
       stressIndex: Number(stress.toFixed(2)),
       consumptionKwhPerKm: Number((baseConsumption * 1.0).toFixed(3)),
       explanations,
@@ -372,7 +391,7 @@ export function evaluateStrategy(id: StrategyId, input: DecisionInput): Strategy
     totalKw: Number((batteryKw + supercapKw).toFixed(2)),
     deficitKw: 0,
     batteryWithinContinuousLimit: batteryKw <= batteryContinuousKw + 0.05,
-    supercapEnergyOk,
+    supercapEnergyOk: scEnergyOk,
     stressIndex: Number(stress.toFixed(2)),
     consumptionKwhPerKm: Number((baseConsumption * 0.96).toFixed(3)),
     explanations,
