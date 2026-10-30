@@ -13,6 +13,7 @@ import {
   DEFAULT_HORIZON_SEC,
   DEFAULT_THRESHOLD_KW,
   DEMO_ROUTE,
+  DEMO_SEGMENTS,
   DEMO_VEHICLE,
   routeSegmentAtKm,
   supercapMaxAssistKw,
@@ -92,7 +93,7 @@ function cycleTargetKph(t: number): number {
 
 function buildCycle(): CycleRow[] {
   const rows: CycleRow[] = [];
-  let v = DEMO_VEHICLE.initialSpeedKph; // canonical start: 48 km/h
+  let v = 48; // canonical start speed: 48 km/h
   let pos = 0;
   const dt = CYCLE_DT;
   for (let t = 0; t <= CYCLE_SECONDS; t += dt) {
@@ -110,12 +111,6 @@ function buildCycle(): CycleRow[] {
     rows.push({ speedKph: v, accelMs2: Number(a.toFixed(3)) });
   }
   return rows;
-}
-
-declare module "./demo-data" {
-  interface VehicleProfileExtras {
-    initialSpeedKph: number;
-  }
 }
 
 const CYCLE: CycleRow[] = buildCycle();
@@ -225,7 +220,7 @@ export function createCanonicalPoint(params: SimParams = DEFAULT_SIM_PARAMS): Te
     prevSpeedKph: row.speedKph,
     accelMs2: row.accelMs2,
     gradientPct: segment.gradientPct,
-    segmentIndex: DEMO_SEGMENTS_INDEX_ZERO,
+    segmentIndex: 0,
     segmentName: segment.name,
     powerKw: Number(tractionPowerKw(row.speedKph, row.accelMs2, segment.gradientPct, profile).toFixed(2)),
     batteryKw: 0,
@@ -245,11 +240,8 @@ export function createCanonicalPoint(params: SimParams = DEFAULT_SIM_PARAMS): Te
   base.batteryKw = Number((demand - supercapKw).toFixed(2));
   base.supercapKw = Number(supercapKw.toFixed(2));
   const decorated = decorate(base, params);
-  // The canonical demo must always read as the spec example: assist pre-positioned.
-  return { ...decorated, recommendedMode: decorated.recommendedMode === "Battery Only" && decorated.predictedMaxKw > params.thresholdKw ? "Battery + Supercapacitor Assistance" : decorated.recommendedMode };
+  return decorated;
 }
-
-const DEMO_SEGMENTS_INDEX_ZERO = 0;
 
 /** Advance the shared simulation by one second. */
 export function stepSim(prev: TelemetryPoint, params: SimParams = DEFAULT_SIM_PARAMS): TelemetryPoint {
