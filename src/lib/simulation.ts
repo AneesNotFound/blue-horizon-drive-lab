@@ -309,3 +309,22 @@ export function stepSim(prev: TelemetryPoint, params: SimParams = DEFAULT_SIM_PA
 }
 
 export { mergeProfile };
+
+/** Strategy comparison snapshot used by the dashboard panel (simulated). */
+export function strategyComparison(latest: TelemetryPoint) {
+  const hybridPeak = Math.max(latest.batteryKw, 0.1);
+  return {
+    batteryOnly: {
+      peakBatteryPowerKw: Math.max(latest.powerKw, 0.1),
+      socUsedLast60sPct: 0.42,
+      energyKwhPerKm: Number((latest.energyKwhPerKm * 1.04).toFixed(3)),
+      stressIndex: 0.68,
+    },
+    hybrid: {
+      peakBatteryPowerKw: hybridPeak,
+      socUsedLast60sPct: 0.31,
+      energyKwhPerKm: latest.energyKwhPerKm,
+      stressIndex: 0.41,
+    },
+  };
+}

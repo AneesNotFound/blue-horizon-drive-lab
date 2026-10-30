@@ -44,6 +44,9 @@ export type ProfileOverrides = {
   drivetrainEfficiency: number;
 };
 
+/** Kept for existing imports; the configurable value lives in app settings. */
+export const DEMO_HIGH_LOAD_THRESHOLD_KW = DEFAULT_THRESHOLD_KW;
+
 export const DEFAULT_THRESHOLD_KW = 25;
 export const DEFAULT_HORIZON_SEC = 60;
 
@@ -176,14 +179,18 @@ export type DemoIntersection = {
   trafficDensity: TrafficDensity;
   defaultSignal: SignalState;
   stoppingProbability: number;
+  /** Compatibility aliases for existing pages. */
+  stoppingLikelihood: number;
+  type: "Signalised" | "Unsignalised";
+  signalState: "Unavailable";
 };
 
 export const DEMO_INTERSECTIONS: DemoIntersection[] = [
-  { id: "ix-1", name: "Station Square junction", distanceKm: 1.2, trafficDensity: "High", defaultSignal: "Red", stoppingProbability: 0.85 },
-  { id: "ix-2", name: "Market Street crossing", distanceKm: 3.5, trafficDensity: "Medium", defaultSignal: "Green", stoppingProbability: 0.2 },
-  { id: "ix-3", name: "Ring Road merge", distanceKm: 5.8, trafficDensity: "Low", defaultSignal: "Green", stoppingProbability: 0.1 },
-  { id: "ix-4", name: "Riverside Drive signals", distanceKm: 8.1, trafficDensity: "High", defaultSignal: "Red", stoppingProbability: 0.75 },
-  { id: "ix-5", name: "Technology Park gate", distanceKm: 10.6, trafficDensity: "Medium", defaultSignal: "Amber", stoppingProbability: 0.55 },
+  { id: "ix-1", name: "Station Square junction", distanceKm: 1.2, trafficDensity: "High", defaultSignal: "Red", stoppingProbability: 0.85, stoppingLikelihood: 0.85, type: "Signalised", signalState: "Unavailable" as const },
+  { id: "ix-2", name: "Market Street crossing", distanceKm: 3.5, trafficDensity: "Medium", defaultSignal: "Green", stoppingProbability: 0.2, stoppingLikelihood: 0.2, type: "Signalised", signalState: "Unavailable" as const },
+  { id: "ix-3", name: "Ring Road merge", distanceKm: 5.8, trafficDensity: "Low", defaultSignal: "Green", stoppingProbability: 0.1, stoppingLikelihood: 0.1, type: "Unsignalised", signalState: "Unavailable" as const },
+  { id: "ix-4", name: "Riverside Drive signals", distanceKm: 8.1, trafficDensity: "High", defaultSignal: "Red", stoppingProbability: 0.75, stoppingLikelihood: 0.75, type: "Signalised", signalState: "Unavailable" as const },
+  { id: "ix-5", name: "Technology Park gate", distanceKm: 10.6, trafficDensity: "Medium", defaultSignal: "Amber", stoppingProbability: 0.55, stoppingLikelihood: 0.55, type: "Signalised", signalState: "Unavailable" as const },
 ];
 
 /** Simulated effect of a signal state on predicted power demand (kW spike). */

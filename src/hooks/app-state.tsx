@@ -42,7 +42,7 @@ export const DEFAULT_SETTINGS: DemoSettings = {
   highLoadThresholdKw: DEFAULT_THRESHOLD_KW,
   trafficSignalsEnabled: true,
   profile: {
-    massKg: DEMO_OVERRIDE.massKg,
+    massKg: 1500,
     batteryCapacityKwh: 60,
     batteryVoltage: 400,
     batteryContinuousPowerKw: 25,
@@ -51,8 +51,6 @@ export const DEFAULT_SETTINGS: DemoSettings = {
     drivetrainEfficiency: 0.92,
   },
 };
-
-const DEMO_OVERRIDE = { massKg: 1500 } as const;
 
 export type SignalOverrides = Record<string, SignalState>;
 
