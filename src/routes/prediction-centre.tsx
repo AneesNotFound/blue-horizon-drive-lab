@@ -1,13 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BrainCircuit, ShieldAlert } from "lucide-react";
 
+import { DemandForecastChart } from "@/components/dashboard/charts";
 import { MetricCard } from "@/components/dashboard/metric-card";
+import { ProbabilityGauge } from "@/components/dashboard/gauge";
 import { PageHeader } from "@/components/page-shell";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { useSimulatedForecast, useSimulatedTelemetry } from "@/hooks/use-simulated-telemetry";
-import { DEMO_HIGH_LOAD_THRESHOLD_KW } from "@/lib/simulation";
+import { useAppData } from "@/hooks/app-state";
+import {
+  DEMO_SEGMENTS,
+  DEMO_VEHICLE,
+  nextIntersectionAhead,
+  supercapMaxAssistKw,
+  supercapStoredEnergyKwh,
+} from "@/lib/simulation";
 
 export const Route = createFileRoute("/prediction-centre")({
   component: PredictionCentre,
@@ -17,7 +23,7 @@ export const Route = createFileRoute("/prediction-centre")({
       {
         name: "description",
         content:
-          "60-second high-load prediction and power-demand estimates from the Phase 1 demo heuristic, with the trained-model pipeline clearly marked as not yet connected.",
+          "60-second high-load prediction for the Blue Horizon EV: inputs, result, demand graph, probability gauge and explanation from the labelled demo heuristic.",
       },
       { property: "og:title", content: "AI Prediction Centre — Predictive EMS" },
       { property: "og:description", content: "60-second high-load prediction overview (demo heuristic)." },
@@ -27,54 +33,84 @@ export const Route = createFileRoute("/prediction-centre")({
   }),
 });
 
-const DEMO_MODEL = {
-  version: "demo-heuristic v0.1",
-  horizonSeconds: 60,
-  thresholdKw: DEMO_HIGH_LOAD_THRESHOLD_KW,
-  status: "Demo heuristic — no trained model connected",
-};
-
 function PredictionCentre() {
-  const { latest } = useSimulatedTelemetry();
-  const forecast = useSimulatedForecast(latest);
-  const probPct = Math.round(latest.highLoadProbability * 100);
-  const etaEvent = forecast.find((f) => f.probability >= 0.5);
+  const { latest, forecast, settings, params } = useAppData();
+  const thresholdKw = settings.highLoadThresholdKw;
+  const probPct = Math.round(forecast.probability * 100);
+  const scEnergyKwh = supercapStoredEnergyKwh(latest.supercapSocPct, params.profile);
+  const scMaxKw = supercapMaxAssistKw(latest.supercapSocPct, params.profile);
+  const nextIx = nextIntersectionAhead(latest.distanceCoveredKm);
+  const upcomingHill = DEMO_SEGMENTS.find(
+    (s) => s.startKm >= latest.distanceCoveredKm % 12.4 && s.gradientPct > 2,
+  );
+
+  const inputs: { label: string; value: string; note: string }[] = [
+    { label: "Current speed", value: `${latest.speedKph.toFixed(1)} km/h`, note: "Simulated" },
+    { label: "Previous speed", value: `${latest.prevSpeedKph.toFixed(1)} km/h`, note: "Simulated" },
+    { label: "Acceleration", value: `${latest.accelMs2.toFixed(2)} m/s²`, note: "Simulated" },
+    { label: "Road gradient (current)", value: `${latest.gradientPct.toFixed(1)} %`, note: "Demo route segment" },
+    {
+      label: "Upcoming uphill",
+      value: upcomingHill ? `${upcomingHill.name} (+${upcomingHill.gradientPct.toFixed(1)} %)` : "None within horizon",
+      note: "Demo route segment",
+    },
+    { label: "Traffic density ahead", value: "Medium (demo)", note: "Synthetic traffic" },
+    {
+      label: "Distance to next intersection",
+      value: nextIx ? `${nextIx.distanceAheadKm.toFixed(2)} km — ${nextIx.intersection.name}` : "—",
+      note: "Demo fixture",
+    },
+    { label: "Battery SOC", value: `${latest.batterySocPct.toFixed(1)} %`, note: "Simulated" },
+    { label: "Supercapacitor SOC", value: `${latest.supercapSocPct.toFixed(1)} %`, note: "Simulated" },
+  ];
+
+  const explanations = [
+    `The demo drive cycle schedules an acceleration burst at +${forecast.etaSec ?? forecast.peakTSec} s: speed rises toward 72 km/h, and acceleration power (m·a·v) dominates demand.`,
+    `The predicted peak of ${forecast.peakKw.toFixed(1)} kW exceeds the ${thresholdKw} kW high-load threshold, giving a ${probPct}% probability for the ${settings.predictionHorizonSec}-second horizon.`,
+    `The battery's continuous limit is ${DEMO_VEHICLE.batteryContinuousPowerKw} kW, so roughly ${(Math.max(forecast.peakKw - DEMO_VEHICLE.batteryContinuousPowerKw, 0)).toFixed(1)} kW of the peak must be covered by the supercapacitor.`,
+    `Supercapacitor availability was checked before recommending assistance: ${scEnergyKwh.toFixed(4)} kWh stored (½·C·V²), sustaining up to ${scMaxKw.toFixed(1)} kW for about 10 seconds.`,
+    nextIx && nextIx.intersection.stoppingProbability > 0.5
+      ? `A stop at ${nextIx.intersection.name} (${Math.round(nextIx.intersection.stoppingProbability * 100)}% simulated stopping probability) adds a further re-acceleration spike afterwards.`
+      : "Traffic along the route is light enough that no additional stop-and-go spike is expected within the horizon.",
+  ];
 
   return (
     <div className="space-y-5">
       <PageHeader
         title="AI Prediction Centre"
-        phase="Phase 1 — demo heuristic"
-        description="Predicts whether a high-load event occurs within the next 60 seconds and estimates future traction power. The values below come from a transparent demo heuristic; the trained Python (FastAPI + scikit-learn/XGBoost) backend is a later phase and is clearly marked wherever it is absent."
+        phase="Demo heuristic — rule-based"
+        description={`Predicts whether a high-load event occurs within the next ${settings.predictionHorizonSec} seconds and estimates future traction power. The values come from a transparent rule-based demo heuristic; the trained Python (FastAPI + scikit-learn/XGBoost) backend is a later phase and is clearly marked wherever it is absent.`}
       />
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <MetricCard label="Current power demand" value={latest.powerKw.toFixed(1)} unit="kW" source="simulated" />
+        <MetricCard
+          label="Predicted maximum demand"
+          value={forecast.peakKw.toFixed(1)}
+          unit="kW"
+          source="predicted"
+          tone={forecast.peakKw > thresholdKw ? "critical" : "default"}
+          hint={`At +${forecast.peakTSec} s`}
+        />
         <MetricCard
           label="High-load probability"
           value={`${probPct}%`}
           source="predicted"
           tone={probPct >= 50 ? "critical" : probPct >= 30 ? "warning" : "success"}
-          hint={`Horizon: ${DEMO_MODEL.horizonSeconds} s`}
+          hint={`Horizon: ${settings.predictionHorizonSec} s`}
         />
         <MetricCard
-          label="Predicted demand +15 s"
-          value={(forecast[2]?.predictedKw ?? latest.powerKw).toFixed(1)}
-          unit="kW"
+          label="Predicted event"
+          value={forecast.event}
           source="predicted"
+          hint={forecast.etaSec !== null ? `Estimated event time: +${forecast.etaSec} s` : "Below 50% threshold"}
         />
         <MetricCard
-          label="Predicted demand +60 s"
-          value={(forecast[11]?.predictedKw ?? forecast.at(-1)?.predictedKw ?? 0).toFixed(1)}
-          unit="kW"
-          source="predicted"
+          label="Model version"
+          value="demo-heuristic v0.2"
+          source="demo"
+          hint="Rule-based — no trained model connected"
         />
-        <MetricCard
-          label="Event timing"
-          value={etaEvent ? `+${etaEvent.tSec} s` : "None likely"}
-          source="predicted"
-          hint={etaEvent ? `P ≈ ${Math.round(etaEvent.probability * 100)}%` : "Below 50% threshold"}
-        />
-        <MetricCard label="Model version" value={DEMO_MODEL.version} source="demo" hint={DEMO_MODEL.status} />
         <MetricCard
           label="Input data quality"
           value="Good (simulated)"
@@ -83,71 +119,91 @@ function PredictionCentre() {
         />
       </div>
 
-      <Card className="border-border bg-card">
-        <CardHeader>
-          <CardTitle className="font-display text-base">Probability detail</CardTitle>
-          <CardDescription>
-            A probability is not a guarantee. Calibration will be evaluated before any output is described as a
-            reliable confidence score.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <Progress value={probPct} className="h-2.5" />
-          <p className="text-xs text-muted-foreground">
-            {probPct >= 50
-              ? "High-load event likely within the next 60 seconds (demo heuristic)."
-              : "No high-load event expected within the next 60 seconds (demo heuristic)."}
-          </p>
-        </CardContent>
-      </Card>
-
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
-        <Card className="border-border bg-card xl:col-span-6">
+        <Card className="border-border bg-card xl:col-span-5">
           <CardHeader>
-            <CardTitle className="font-display text-base">Features used by the demo heuristic</CardTitle>
+            <CardTitle className="font-display text-base">Input parameters</CardTitle>
             <CardDescription>Only inputs genuinely available at prediction time — no future measured values.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            {[
-              "Current speed (simulated)",
-              "Recent speed history (simulated)",
-              "Acceleration / deceleration (simulated)",
-              "Recent stop-and-go pattern (simulated)",
-              "Vehicle mass (configured demo value)",
-              "Battery SOC (simulated)",
-              "Supercapacitor stored energy (simulated)",
-              "Demo drive-cycle pattern (simulated)",
-            ].map((f) => (
-              <Badge key={f} variant="outline" className="border-border bg-muted text-muted-foreground">
-                {f}
-              </Badge>
-            ))}
+          <CardContent>
+            <dl className="space-y-1.5 text-sm">
+              {inputs.map((i) => (
+                <div key={i.label} className="flex items-baseline justify-between gap-3 border-b border-border/40 pb-1.5 last:border-0">
+                  <dt className="text-muted-foreground">{i.label}</dt>
+                  <dd className="text-right text-foreground">
+                    {i.value} <span className="ml-1 text-[10px] uppercase text-muted-foreground">{i.note}</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </CardContent>
         </Card>
 
-        <Card className="border-border bg-card xl:col-span-6">
+        <Card className="border-border bg-card xl:col-span-3">
           <CardHeader>
-            <CardTitle className="font-display text-base">Planned trained-model pipeline</CardTitle>
-            <CardDescription>Not evaluated — the table fills only after real training and evaluation runs.</CardDescription>
+            <CardTitle className="font-display text-base">Probability gauge</CardTitle>
+            <CardDescription>A probability is not a guarantee; calibration is evaluated only with a trained model.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm text-muted-foreground">
-            <ul className="space-y-1.5">
-              <li>• Threshold baseline, Random Forest and XGBoost compared on validation data.</li>
-              <li>• Time-ordered / trip-grouped train–validation–test splits to prevent leakage.</li>
-              <li>• High-load label: 90th-percentile traction power threshold, configurable.</li>
-              <li>• Regression head for future power demand in kW.</li>
-              <li>• Explanation method (e.g. SHAP) for the selected trained model.</li>
+          <CardContent className="flex flex-col items-center gap-2">
+            <ProbabilityGauge value={forecast.probability} caption={`High-load event within ${settings.predictionHorizonSec} s (demo heuristic)`} />
+            <p className="text-center text-xs text-muted-foreground">
+              {probPct >= 50
+                ? "High-load event likely within the horizon."
+                : "No high-load event expected within the horizon."}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border bg-card xl:col-span-4">
+          <CardHeader>
+            <CardTitle className="font-display text-base">Why the system predicts high demand</CardTitle>
+            <CardDescription>Every reason is traceable to the demo data on this page.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              {explanations.map((e, i) => (
+                <li key={i} className="flex gap-2">
+                  <span className="text-primary">{i + 1}.</span>
+                  <span>{e}</span>
+                </li>
+              ))}
             </ul>
-            <div className="flex items-start gap-2 rounded-md border border-warning/40 bg-warning/10 px-3 py-2 text-xs text-warning">
-              <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>
-                <BrainCircuit className="mr-1 inline h-3.5 w-3.5" />
-                Nothing on this page is a trained-model output yet. All predictions are heuristic and labelled as such.
-              </span>
-            </div>
           </CardContent>
         </Card>
       </div>
+
+      <Card className="border-border bg-card">
+        <CardHeader>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle className="font-display text-base">Predicted power demand over the horizon</CardTitle>
+            <span className="rounded-md border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-warning">
+              Predicted
+            </span>
+          </div>
+          <CardDescription>
+            Demand projection from the shared demo drive cycle, with the {thresholdKw} kW high-load threshold marked.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <DemandForecastChart forecast={forecast.points} thresholdKw={thresholdKw} />
+        </CardContent>
+      </Card>
+
+      <Card className="border-border bg-card">
+        <CardHeader>
+          <CardTitle className="font-display text-base">Model status</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-start gap-2 rounded-md border border-warning/40 bg-warning/10 px-3 py-2 text-xs text-warning">
+            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>
+              <BrainCircuit className="mr-1 inline h-3.5 w-3.5" />
+              This is a simulated, rule-based prediction — not a trained or validated AI model. Planned: threshold
+              baseline, Random Forest and XGBoost with trip-grouped splits, a demand regressor and SHAP explanations.
+            </span>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
