@@ -1,14 +1,16 @@
-# Welcome to your Lovable project
+# Blue Horizon Drive Lab
+
+Build Phase 1 of the attached master prompt: the black-and-blue responsive dashboard and navigation, covering sections 1, 2 and 3. Every navigation item must open a working page. Label every value as measured, dataset-derived, simulated or predicted, and use demo labels where data is not real. Leave Google Maps, the prediction backend, and the energy simulation for later phases.
 
 This project was built with [Lovable](https://lovable.dev).
 
 ## Build with Lovable
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/67e13089-852b-4d3e-abcc-2c00ef0b3999).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
@@ -20,10 +22,3 @@ cd <repository-name>
 npm i
 npm run dev
 ```
-
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
